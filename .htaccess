@@ -1,0 +1,4 @@
+<Files bookmarks.db>
+	Order deny,allow
+	Deny from all
+</Files>

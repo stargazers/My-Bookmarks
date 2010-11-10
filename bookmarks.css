@@ -1,0 +1,234 @@
+/* This should be bulletproof, Paul Irish -tip.
+http://paulirish.com/2009/bulletproof-font-face-implementation-syntax/
+ */
+@font-face 
+{
+	font-family: 'Daniel';
+	src: url( 'http://stargazers.nor.fi/fonts/daniel/daniel-webfont.eot' );
+	src: local('☺'), url( 'http://stargazers.nor.fi/fonts/daniel/daniel-webfont.woff' ) format('woff'), 
+		 url( 'http://stargazers.nor.fi/fonts/daniel/daniel-webfont.ttf' ) 
+			 format('truetype');
+}
+
+@font-face 
+{
+	font-family: 'Sansation';
+src: url( 'http://stargazers.nor.fi/fonts/sansation/sansation_regular-webfont.eot' );
+src: local('☺'), 
+		 url( 'http://stargazers.nor.fi/fonts/sansation/sansation_regular-webfont.woff' ) 
+			 format('woff'), 
+		 url( 'http://stargazers.nor.fi/fonts/sansation/sansation_regular-webfont.ttf' ) 
+			 format('truetype');
+}
+
+h2
+{
+	font-family: 'Daniel', sans-serif;
+}
+
+body
+{
+	background-color: white;
+	color: black;
+	margin-left: auto;
+	margin-right: auto;
+	text-align: center;
+	width: 90%;
+}
+
+a:link, a:visited
+{
+	font-family: 'Daniel';
+	color: red;
+	text-decoration: underline;
+}
+
+a:hover
+{
+	color: black;
+	text-decoration: none;
+}
+
+form
+{
+	margin-left: auto;
+	margin-right: auto;
+	width: 400px;
+}
+
+table
+{
+	width: 100%;
+}
+
+#ownpage_inner
+{
+	width: 50%;
+	margin-left: auto;
+   	margin-right: auto;
+	text-align: left;
+	padding: 10px;
+	font-family: 'Sansation';
+}
+
+#ownpage_inner a:link, #ownpage_inner a:visited
+{
+	font-family: 'Sansation', sans-serif;
+}
+
+#ownpage_inner img
+{
+	border: 0px;
+}
+
+#ownpage, .link_handling, #confirmation
+{
+	margin-top: 50px;
+}
+
+#ownpage a:link, #ownpage a:visited
+{
+	color: red;
+	text-decoration: underline;
+}
+
+#ownpage a:hover
+{
+	color: black;
+	text-decoration: none;
+}
+
+#login, #register, #own_page, #register_ok
+{
+	font-family: 'Daniel', sans-serif;
+	margin-top: 90px;
+	font-size: 120%;
+}
+
+#login input[type=submit], 
+#register input[type=submit],
+.link_handling input[type=submit]
+{
+	color: red;
+    background-color: white;
+	border: 0px;
+	font-family: 'Daniel';
+	font-size: 18px;
+	text-decoration: underline;
+	cursor: pointer;
+}
+
+#login input[type=text], #login input[type=password]
+{
+	width: 200px;
+}
+
+
+.message
+{
+	margin-top: -10px;
+	margin-bottom: 10px;
+	border: 1px dotted gray;
+	padding: 10px;
+	width: 500px;
+	margin-left: auto;
+	margin-right: auto;
+}
+
+.message img
+{
+	margin-left: 10px; 
+	margin-right: 10px;
+	border: 0px;
+}
+
+.message a:link, .message a:visited
+{
+	font-size: 70%;
+	color: red;
+   	text-decoration: underline;
+}
+
+.message a:hover
+{
+	color: black;
+   	text-decoration: none;
+}
+
+.close_icon
+{
+	float: right;
+}
+
+#text_create_account, .back
+{
+	margin-top: 70px;
+}
+
+.separator
+{
+	margin-left: 10px;
+	margin-right: 10px;
+	font-size: 160%;
+}
+
+.link_handling input[type=text]
+{
+	width: 200px;
+}
+
+ul
+{
+	list-style-type: square;
+	margin-left: 60px;
+}
+
+
+.link_edit td
+{
+	font-family: 'Sansation';
+	text-align: left;
+	padding: 5px;
+}
+
+.edit
+{
+	display: none;
+}
+
+.link_handling table
+{
+	margin-bottom: 20px;
+}
+
+.bookmark
+{
+	margin-left: 60px;
+	margin-top: 20px;
+}
+
+.bookmark img
+{
+	margin-right: 20px;
+}
+
+.edit_form
+{
+	display: none;
+	 margin-left: 50px;
+	 font-variant: small-caps;
+	 margin-bottom: 15px;
+	padding: 15px;
+}
+
+#no_bookmarks
+{
+	margin-top: 20px;
+	margin-left: 50px;
+}
+
+#logout
+{
+	margin-top: -30px;
+	float: right;
+}
