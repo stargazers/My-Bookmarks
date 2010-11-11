@@ -277,8 +277,9 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 			// Create link for "Remove"
 			$html->setExtraParams( array( 'title' => 'Yes, remove it' ) );
-			$link_remove = $html->createLink( 'index.php?page=remove&id=' 
-				. $_GET['id'] . '&confirm=1', $ok );
+			$link_remove = $html->createLink( 
+				'index.php?page=remove&amp;id=' 
+				. $_GET['id'] . '&amp;confirm=1', $ok );
 
 			// Create link for "Don't remove"
 			$html->setExtraParams( array( 
@@ -305,11 +306,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 			// Create our div
 			echo $html->createDiv( $logout . $h . $text . $link_remove 
 				. $span .  $link_dont . $btm );
-			echo $html->createSiteBottom();
-
-			//echo '<span class="separator"></span>';
-
-			//create_div_bottom();
 		}
 	}
 
@@ -363,8 +359,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 		
 		$html->setExtraParams( array( 'class' => 'link_handling' ) );
 		echo $html->createDiv( $logout . $h . $form_out . $btm );
-
-		//create_div_bottom();
 	}
 
 	// **************************************************
@@ -405,6 +399,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 		@brief This will create list of bookmarks what
 		  currently logged user have. This will be called
 		  from create_own_page function!
+	
+		@return String
 	*/
 	// **************************************************
 	function show_all_bookmarks()
@@ -416,51 +412,58 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 		// There were items! Show them here now.
 		if( $ret != -1 )
 		{
+			$content = '';
 			$num = count( $ret );
 
-			echo '<div class="bookmark">';
 			for( $i=0; $i < $num; $i++ )
 			{
 				$url = $ret[$i]['url'];
 				$id = $ret[$i]['id'];
 				$desc = $ret[$i]['description'];
 
-				// Down-arrow.
+				// Down-arrow image
 				$html->setExtraParams( array( 
 					'title' => 'Click to see options',
 					'id' => 'img_' . $id ) );
-				echo $html->createImg( $img_url . '1downarrow.png' );
+				$img = $html->createImg( $img_url . '1downarrow.png' );
 
-				// Link itself
-				$html->setExtraParams( array( 'id' => 'url_ '. $id ) );
-				echo $html->createLink( $url, $desc );
-
-				echo '<br />';
-				echo '<div class="edit_form" id="ef_' . $id . '">';
-				echo $url . '<br />';
+				// Link with correct title
+				$html->setExtraParams( array( 'id' => 'url_'. $id ) );
+				$link = $html->createLink( $url, $desc );
 
 				// Edit-link
-				echo $html->createLink( 'index.php?page=edit&id=' . $id, 
-					'Edit' );
-
-				echo '<span class="separator">&nbsp;</span>';
+				$edit_link = $html->createLink( 
+					'index.php?page=edit&amp;id=' . $id, 'Edit' );
 
 				// Delete-link
-				echo $html->createLink( 'index.php?page=remove&id=' . $id, 
-					'Delete' );
+				$delete_link = $html->createLink( 
+					'index.php?page=remove&amp;id=' . $id, 'Delete' );
 
-				echo '</div>';
+				// Seperator-span
+				$html->setExtraParams( array( 'class' => 'separator' ) );
+				$span = $html->createSpan( '&nbsp;' );
+
+				// Create Edit Form -div, where is Edit and Delete links
+				$html->setExtraParams( array( 
+					'class' => 'edit_form',
+					'id' => 'ef_' .$id ) );
+				$edit_form = $html->createDiv( $url . '<br />' 
+					. $edit_link . $span . $delete_link );
+
+				// Create actual div where is down arrow, link itself
+				// and the Edit form div what we made above.
+				$content .= $html->createDiv( $img . $link . $edit_form );
 			}
-			echo '</div>';
+
+			$html->setExtraParams( array( 'class' => 'bookmark' ) );
+			return $html->createDiv( $content );
 		}
 		else
 		{
-			echo '<div id="no_bookmarks"">';
-			echo 'You have no any bookmarks stored. '
-				. 'Add new bookmark by pressing + icon on the top.';
-			echo '</div>';
+			$text = 'You have no any bookmarks stored. '
+				. 'Add new bookmarks by pressing + icon on the top.';
+			return $html->createDiv( $text );
 		}
-		echo '</div>';
 	}
 
 	// **************************************************
@@ -499,29 +502,34 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 	// **************************************************
 	function create_own_page( $html )
 	{
-		echo $html->createSiteTop( 'Bookmarks' );
-		echo create_logout_button( $html );
+		$img_url = 'icons/nuvola/32x32/actions/';
+		$logout = create_logout_button( $html );
+		$h = $html->createH( '2', 'My Bookmarks' );
 
-		echo '<div id="ownpage">';
-		echo '<h2>My Bookmarks</h2>';
-		echo '<div id="ownpage_inner">';
-
+		// Create link where we can add bookmark
 		$html->setExtraParams( array(
 			'title' => 'Add new bookmark' ) );
-
-		$img_url = 'icons/nuvola/32x32/actions/';
 		$img = $html->createImg( $img_url . 'edit_add.png' );
-		echo $html->createLink( 'index.php?page=add', $img );
+		$link = $html->createLink( 'index.php?page=add', $img );
 
-		echo '<span class="separator"></span>';
-		echo '<br />';
+		// Seperator
+		$html->setExtraParams( array( 'class' => 'separator' ) );
+		$span = $html->createSpan( '&nbsp;' );
 
-		show_all_bookmarks();
-		
-		echo '<br />';
+		// Get bookmarks
+		$ret = show_all_bookmarks();
 
-		echo '</div>';
+		// Ownpage Inner -div
+		$html->setExtraParams( array( 'id' => 'ownpage_inner' ) );
+		$inner_div = $html->createDiv( $link . $ret );
+
+		// Ownpage-div
+		$html->setExtraParams( array( 'id' => 'ownpage' ) );
+		$div = $html->createDiv( $logout . $h . $inner_div );
+
+		echo $html->createSiteTop( 'Bookmarks' );
 		include 'edit_bookmarks.js';
+		echo $div;
 	}
 
 	// **************************************************
