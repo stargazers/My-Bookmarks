@@ -53,20 +53,25 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 	// **************************************************
 	function create_login_form( $html )
 	{
+		// Create form 
 		$form = new CForm( 'index.php', 'post' );
-
-		echo '<div id="login">';
-		echo '<h2>My Bookmarks - Login</h2>';
-		echo $html->showMessage();
 		$form->addTextField( 'Username: ', 'username' );
 		$form->addPasswordField( 'Password: ', 'password' );
 		$form->addSubmit( 'Login', 'submit' );
-		echo $form->createForm();
+		$form_out = $form->createForm();
 
-		echo '<p id="text_create_account">No account? ';
-		echo $html->createLink( 'register.php', 'Create it', false );
-		echo '</p>';
-		echo '</div>';
+		// Create <h2> and show Message
+		$h = $html->createH( '2', 'My Bookmarks - Login' );
+		$msg = $html->showMessage();
+
+		// Create link for registeration
+		$link = $html->createLink( 'register.php', 'Create it' );
+		$p = $html->createP( 'No account? ' . $link );
+
+		// Create div and put above content in it.
+		$html->setExtraParams( array( 'id' => 'login' ) );
+		echo $html->createSiteTop( 'My Bookmarks - Login page' );
+		echo $html->createDiv( $h . $msg . $form_out . $p );
 	}
 
 	// **************************************************
@@ -147,13 +152,12 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 		@return True if "own page" much be created, false if not.
 	*/
 	// **************************************************
-	function handle_get_values( $db )
+	function handle_get_values( $db, $html )
 	{
 		if(! isset( $_GET ) )
 			return;
 		
 		$g = $_GET;
-		$html = new CHTML();
 
 		// Logout
 		if( isset( $g['action'] ) && $g['action'] == 'logout' )
@@ -177,7 +181,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 			}
 			else if( $g['page'] == 'remove' )
 			{
-				remove_bookmarks( $db );
+				remove_bookmarks( $db, $html );
 				return false;
 			}
 		}
@@ -212,21 +216,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 	}
 
 	// **************************************************
-	//	create_div_bottom
-	/*!
-		@brief Create bottom for divs used when creating, 
-		  editing or deleting bookmark. Eg. creates link where
-		  we can go back to listing or logout.
-	*/
-	// **************************************************
-	function create_div_bottom()
-	{
-		$html = new CHTML();
-		echo $html->createLink( 'index.php', 'Back to bookmarks list' );
-		echo '</div>';
-	}
-
-	// **************************************************
 	//	remove_bookmarks
 	/*!
 		@brief This will remove bookmark if there is GET parameter
@@ -234,14 +223,14 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 		  dialog first here.
 
 		@param $db CSQLite database connection.
+
+		@param $html CHTML class instance.
 	*/
 	// **************************************************
-	function remove_bookmarks( $db )
+	function remove_bookmarks( $db, $html )
 	{
 		if(! isset( $_GET['id'] ) )
 			return;
-
-		$html = new CHTML();
 
 		// Get user bookmarks
 		$ret = get_all_bookmarks_for_logged_user();
@@ -277,35 +266,50 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 		{
 			$q = 'SELECT * FROM bookmarks WHERE id=' . $_GET['id'];
 			$ret = $db->queryAndAssoc( $q );
-
-			echo $html->createSiteTop( 'Bookmarks');
-			create_logout_button( $html );
-
-			echo '<div id="confirmation">';
-			echo '<h2>Delete bookmark</h2>';
-
-			echo 'Are you sure that you want delete bookmark "'
-				. $ret[0]['description'] . '"?<br /><br />';
-
-			// Create two images
 			$img_url = 'icons/nuvola/32x32/actions/';
+
+			// Create logout-button
+			$logout = create_logout_button( $html );
+
+			// Create two images, "Ok" and "Cancel"
 			$ok = $html->createImg( $img_url . 'apply.png' );
 			$cancel = $html->createImg( $img_url . 'cancel.png' );
 
-			// Remove it imagelink
+			// Create link for "Remove"
 			$html->setExtraParams( array( 'title' => 'Yes, remove it' ) );
-			echo $html->createLink( 'index.php?page=remove&id=' 
+			$link_remove = $html->createLink( 'index.php?page=remove&id=' 
 				. $_GET['id'] . '&confirm=1', $ok );
 
-			echo '<span class="separator"></span>';
-
-			// Don't remove it -imagelink
+			// Create link for "Don't remove"
 			$html->setExtraParams( array( 
 				'title'=> 'No, don\'t remove it' ) );
-			echo $html->createLink( 'index.php', $cancel );
+			$link_dont = $html->createLink( 'index.php', $cancel );
 
-			echo '<br /><br />';
-			create_div_bottom();
+			// Header and text inside div
+			$h = $html->createH( '2', 'Delete bookmark' );
+			$text = 'Are you sure that you want to delete bookmark "'
+				. $ret[0]['description'] . '"?<br /><br />';
+
+			// Separator span
+			$html->setExtraParams( array( 'class' =>'separator' ) );
+			$span = $html->createSpan( '&nbsp;' );
+
+			// Back to bookmarks -link
+			$html->setExtraParams( array( 'class' => 'back' ) );
+			$btm = $html->createLink( 'index.php', 
+				'Back to bookmarks list' );
+
+			echo $html->createSiteTop( 'Bookmarks');
+			$html->setExtraParams( array( 'id' => 'confirmation' ) );
+
+			// Create our div
+			echo $html->createDiv( $logout . $h . $text . $link_remove 
+				. $span .  $link_dont . $btm );
+			echo $html->createSiteBottom();
+
+			//echo '<span class="separator"></span>';
+
+			//create_div_bottom();
 		}
 	}
 
@@ -322,15 +326,23 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 		if(! isset( $_GET['id'] ) )
 			return;
 
+		$html = new CHTML();
 		$form = new CForm( 'edit.php', 'post' );
+		$form_out = '';
+
 		$q = 'SELECT * FROM bookmarks WHERE id=' . $_GET['id'];
 		$ret = $db->queryAndAssoc( $q );
 
-		$html = new CHTML();
-		create_logout_button( $html );
+		// Logout-button
+		$logout = create_logout_button( $html );
 
-		echo '<div class="link_handling">';
-		echo '<h2>Edit bookmarks</h2>';
+		// Header
+		$h = $html->createH( '2', 'Edit bookmarks' );
+
+		// Back to bookmarks -link
+		$html->setExtraParams( array( 'class' => 'back' ) );
+		$btm = $html->createLink( 'index.php', 
+			'Back to bookmarks list' );
 
 		// Make sure that we can edit only our own bookmarks.
 		if( $ret[0]['user_id'] == $_SESSION['bookmarks']['id'] )
@@ -346,10 +358,13 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 			$form->addHiddenField( 'bookmark_id', $ret[0]['id'] );
 			$form->addSubmit( 'Update bookmark', 'submit' );
 
-			echo $form->createForm();
+			$form_out = $form->createForm();
 		}
+		
+		$html->setExtraParams( array( 'class' => 'link_handling' ) );
+		echo $html->createDiv( $logout . $h . $form_out . $btm );
 
-		create_div_bottom();
+		//create_div_bottom();
 	}
 
 	// **************************************************
@@ -362,17 +377,26 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 	{
 		$html = new CHTML();
 		$form = new CForm( 'add.php', 'post' );
+
+		// Craete form
 		$form->addTextField( 'Link URL: ', 'url' );
 		$form->addTextField( 'Description: ', 'description' );
 		$form->addSubmit( 'Save new bookmark', 'submit' );
+		$form_out = $form->createForm();
 
-		create_logout_button( $html );
-		echo '<div class="link_handling">';
-		echo '<h2>Create new bookmark</h2>';
-		echo $form->createForm();
-		echo '<br />';
+		// Create logout-button
+		$logout = create_logout_button( $html );
 
-		create_div_bottom();
+		// Header of page
+		$h = $html->createH( '2', 'Create new bookmark' );
+
+		// Create link 'Back to bookmarks'
+		$html->setExtraParams( array( 'class' => 'back' ) );
+		$btm = $html->createLink( 'index.php', 'Back to bookmarks list' );
+
+		// Create DIV with above elements
+		$html->setExtraParams( array( 'class' => 'link_handling' ) );
+		echo $html->createDiv( $logout . $h . $form_out . $btm );
 	}
 
 	// **************************************************
@@ -439,14 +463,29 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 		echo '</div>';
 	}
 
+	// **************************************************
+	//	create_logout_button
+	/*!
+		@brief Create logout-button inside logout-div
+
+		@param $html CHTML class instance
+
+		@return String
+	*/
+	// **************************************************
 	function create_logout_button( $html )
 	{
-		echo '<div id="logout">';
+		// Icons path
 		$img_url = 'icons/nuvola/48x48/actions/';
+
+		// Create image what is link to 'logout.php'
 		$html->setExtraParams( array( 'title' => 'Log out' ) );
 		$logout = $html->createImg( $img_url . 'exit.png' );
-		echo $html->createLink( 'index.php?action=logout', $logout );
-		echo '</div>';
+		$link = $html->createLink( 'index.php?action=logout', $logout );
+
+		// Create DIV.
+		$html->setExtraParams( array( 'id' => 'logout' ) );
+		return $html->createDiv( $link );
 	}
 
 	// **************************************************
@@ -458,11 +497,10 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 		@param $db Database class.
 	*/
 	// **************************************************
-	function create_own_page()
+	function create_own_page( $html )
 	{
-		$html = new CHTML();
-
-		create_logout_button( $html );
+		echo $html->createSiteTop( 'Bookmarks' );
+		echo create_logout_button( $html );
 
 		echo '<div id="ownpage">';
 		echo '<h2>My Bookmarks</h2>';
@@ -498,17 +536,16 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 		$db = new CSQLite();
 		$db->connect( 'bookmarks.db' );
 
+		// Include JQuery and CSS file and create HTML headers.
+		$html->setJS( 'jquery/jquery-1.4.3.js' );
+		$html->setCSS( 'bookmarks.css' );
+
 		// Check if there is POST-values (eg. login information)
 		handle_post_values( $html );
 
 		// This will return true if we need to create own page.
 		// False will be set if we do not want to show own page.
-		$ret = handle_get_values( $db );
-
-		// Include JQuery and CSS file and create HTML headers.
-		$html->setJS( 'jquery/jquery-1.4.3.js' );
-		$html->setCSS( 'bookmarks.css' );
-		echo $html->createSiteTop( 'Bookmarks');
+		$ret = handle_get_values( $db, $html );
 
 		// If we are not logged in, create login form.
 		// If we are logged in and handle_get_values returned true,
@@ -516,7 +553,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 		if(! logged_in() )
 			create_login_form( $html );
 		else if( $ret == true )
-			create_own_page();
+			create_own_page( $html );
 
 		echo $html->createSiteBottom();
 	}

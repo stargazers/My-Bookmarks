@@ -232,3 +232,8 @@ ul
 	margin-top: -30px;
 	float: right;
 }
+
+.back
+{
+	display: block;
+}
