@@ -63,6 +63,10 @@ function main( $data )
 	$desc = $db->makeSafeForDb( $data['description'] );
 	$url = $db->makeSafeForDb( $data['url'] );
 
+	// If description is empty, use URL as a text.
+	if( trim( $desc ) == '' )
+		$desc = $url;
+
 	// Update value from database.
 	$q = 'UPDATE bookmarks SET description="' . $desc . '", url="'
 		. $url . '" WHERE id="' . $id . '"';
